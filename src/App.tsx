@@ -9,6 +9,8 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { NetworkStatus } from "@/components/NetworkStatus";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import AuthPage from "./pages/AuthPage";
+import AuthDemo from "./pages/AuthDemo";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
@@ -40,6 +42,8 @@ function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/auth-page" element={<AuthPage />} />
+                <Route path="/auth-demo" element={<AuthDemo />} />
                 <Route path="/dashboard/*" element={
                   <ProtectedRoute>
                     <Dashboard />
