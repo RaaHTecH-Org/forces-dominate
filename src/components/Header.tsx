@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogIn } from "lucide-react";
+import { Link } from "react-router-dom";
 import sneakerIcon from "@/assets/sneaker-icon.png";
 
 const Header = () => {
@@ -20,14 +21,14 @@ const Header = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3">
             <img src={sneakerIcon} alt="BLACKFORCES" className="w-8 h-8" />
             <span className="text-2xl font-bold font-mono tracking-tight">
               <span className="text-primary">BLACK</span>
               <span className="text-secondary">FORCES</span>
               <span className="text-primary text-xs">™</span>
             </span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
@@ -47,9 +48,11 @@ const Header = () => {
             {isLoggedIn ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm text-muted-foreground">Full Force Mode</span>
-                <Button variant="elite" size="sm">
-                  <User className="w-4 h-4" />
-                  Dashboard
+                <Button variant="elite" size="sm" asChild>
+                  <Link to="/dashboard">
+                    <User className="w-4 h-4" />
+                    Dashboard
+                  </Link>
                 </Button>
               </div>
             ) : (
@@ -91,9 +94,11 @@ const Header = () => {
               ))}
               <div className="pt-4 border-t border-primary/20">
                 {isLoggedIn ? (
-                  <Button variant="elite" className="w-full">
-                    <User className="w-4 h-4" />
-                    Dashboard
+                  <Button variant="elite" className="w-full" asChild>
+                    <Link to="/dashboard">
+                      <User className="w-4 h-4" />
+                      Dashboard
+                    </Link>
                   </Button>
                 ) : (
                   <Button 
