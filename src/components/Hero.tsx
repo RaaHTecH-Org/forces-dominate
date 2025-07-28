@@ -38,7 +38,7 @@ const Hero = () => {
           {/* Main heading with glitch effect */}
           <h1 className="text-6xl md:text-8xl font-bold font-mono mb-6 relative">
             <span 
-              className="glitch-text gradient-glitch bg-clip-text text-transparent"
+              className="glitch-text text-primary"
               data-text={glitchText}
             >
               {glitchText}
