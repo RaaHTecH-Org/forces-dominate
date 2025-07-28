@@ -1,0 +1,27 @@
+{
+  "routes": [
+    {
+      "route": "/auth",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/auth-page",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/auth-demo",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/dashboard/*",
+      "rewrite": "/index.html"
+    }
+  ],
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/images/*.{png,jpg,gif}", "/css/*", "/assets/*"]
+  },
+  "mimeTypes": {
+    ".json": "application/json"
+  }
+}
