@@ -3,7 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +17,60 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function DashboardHeader() {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [profile, setProfile] = useState<{ full_name?: string; avatar_url?: string } | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      // Fetch user profile data
+      const fetchProfile = async () => {
+        const { data } = await supabase
+          .from('profiles')
+          .select('full_name, avatar_url')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (data) {
+          setProfile(data);
+        }
+      };
+      
+      setTimeout(fetchProfile, 0);
+    }
+  }, [user]);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Signed out successfully",
+        description: "You have been signed out of your account.",
+      });
+      navigate('/');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getInitials = (name?: string, email?: string) => {
+    if (name) {
+      return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    }
+    if (email) {
+      return email.substring(0, 2).toUpperCase();
+    }
+    return 'BF';
+  };
+
+  const displayName = profile?.full_name || user?.email?.split('@')[0] || 'User';
+  const initials = getInitials(profile?.full_name, user?.email);
+
   return (
     <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm">
       <div className="flex items-center justify-between px-6 py-4">
@@ -39,11 +97,13 @@ export function DashboardHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-3 hover:bg-muted/50">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src="/placeholder.svg" />
-                  <AvatarFallback className="bg-primary text-primary-foreground">BF</AvatarFallback>
+                  <AvatarImage src={profile?.avatar_url} />
+                  <AvatarFallback className="bg-primary text-primary-foreground">
+                    {initials}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="text-left hidden md:block">
-                  <p className="text-sm font-medium">User Name</p>
+                  <p className="text-sm font-medium">{displayName}</p>
                   <p className="text-xs text-muted-foreground">Premium Member</p>
                 </div>
               </Button>
@@ -59,7 +119,12 @@ export function DashboardHeader() {
                 <Link to="/dashboard/billing">Billing</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">Sign Out</DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-destructive cursor-pointer"
+                onClick={handleSignOut}
+              >
+                Sign Out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

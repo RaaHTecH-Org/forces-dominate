@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import sneakerIcon from "@/assets/sneaker-icon.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user } = useAuth();
 
   const navItems = [
     { name: "Features", href: "#features" },
@@ -45,7 +46,7 @@ const Header = () => {
 
           {/* Auth Panel */}
           <div className="hidden md:flex items-center gap-4">
-            {isLoggedIn ? (
+            {user ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm text-muted-foreground">Full Force Mode</span>
                 <Button variant="elite" size="sm" asChild>
@@ -59,10 +60,12 @@ const Header = () => {
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => setIsLoggedIn(true)}
+                asChild
               >
-                <LogIn className="w-4 h-4" />
-                Login
+                <Link to="/auth">
+                  <LogIn className="w-4 h-4" />
+                  Login
+                </Link>
               </Button>
             )}
           </div>
@@ -93,7 +96,7 @@ const Header = () => {
                 </a>
               ))}
               <div className="pt-4 border-t border-primary/20">
-                {isLoggedIn ? (
+                {user ? (
                   <Button variant="elite" className="w-full" asChild>
                     <Link to="/dashboard">
                       <User className="w-4 h-4" />
@@ -104,10 +107,12 @@ const Header = () => {
                   <Button 
                     variant="outline" 
                     className="w-full"
-                    onClick={() => setIsLoggedIn(true)}
+                    asChild
                   >
-                    <LogIn className="w-4 h-4" />
-                    Login
+                    <Link to="/auth">
+                      <LogIn className="w-4 h-4" />
+                      Login
+                    </Link>
                   </Button>
                 )}
               </div>
