@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Link } from "react-router-dom";
 import {
   TrendingUp,
   ShoppingBag,
@@ -131,8 +132,8 @@ export function DashboardContent() {
                 </div>
               </div>
             ))}
-            <Button variant="outline" className="w-full">
-              View All Orders
+            <Button variant="outline" className="w-full" asChild>
+              <Link to="/dashboard/orders">View All Orders</Link>
             </Button>
           </CardContent>
         </Card>
@@ -189,17 +190,23 @@ export function DashboardContent() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button variant="outline" className="h-20 flex-col gap-2">
-              <Heart className="w-5 h-5" />
-              <span>View Wishlist</span>
+            <Button variant="outline" className="h-20 flex-col gap-2" asChild>
+              <Link to="/dashboard/wishlist">
+                <Heart className="w-5 h-5" />
+                <span>View Wishlist</span>
+              </Link>
             </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2">
-              <Calendar className="w-5 h-5" />
-              <span>Track Orders</span>
+            <Button variant="outline" className="h-20 flex-col gap-2" asChild>
+              <Link to="/dashboard/orders">
+                <Calendar className="w-5 h-5" />
+                <span>Track Orders</span>
+              </Link>
             </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2">
-              <DollarSign className="w-5 h-5" />
-              <span>Billing & Payments</span>
+            <Button variant="outline" className="h-20 flex-col gap-2" asChild>
+              <Link to="/dashboard/billing">
+                <DollarSign className="w-5 h-5" />
+                <span>Billing & Payments</span>
+              </Link>
             </Button>
           </div>
         </CardContent>
