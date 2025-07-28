@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import { usePageTracking } from "@/hooks/usePageTracking";
+import { SEOHead } from "@/components/SEOHead";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
@@ -12,6 +14,8 @@ import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 
 const Index = () => {
+  usePageTracking();
+
   useEffect(() => {
     // Smooth scroll behavior for anchor links
     const handleSmoothScroll = (e: Event) => {
@@ -32,6 +36,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead 
+        title="BLACKFORCES™ - Elite Sneaker Bot Network"
+        description="Professional sneaker automation tools and bot network. Join thousands of successful sneaker entrepreneurs maximizing their profits with our elite infrastructure."
+        keywords="sneaker bot, nike bot, adidas bot, sneaker automation, sneaker reselling, bot network, sneaker software"
+      />
       <Header />
       <main>
         <Hero />
