@@ -1,42 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* BLACKFORCES™ Design System - Dark Mode Elite Aesthetic */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* BLACKFORCES Core Colors - Matte Black + Neon Accents */
+    --background: 0 0% 6%;           /* Deep matte black */
+    --foreground: 120 100% 95%;      /* Near-white with slight green tint */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 8%;                 /* Slightly lighter black for cards */
+    --card-foreground: 120 100% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 120 100% 95%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Neon Green Primary (BLACKFORCES signature) */
+    --primary: 120 100% 50%;         /* Electric neon green #00FF41 */
+    --primary-foreground: 0 0% 6%;   /* Black text on green */
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Purple Glitch Accent */
+    --secondary: 280 65% 60%;        /* Glitch purple #9D4EDD */
+    --secondary-foreground: 120 100% 95%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 0 0% 12%;              /* Dark gray for muted elements */
+    --muted-foreground: 0 0% 60%;   /* Medium gray text */
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 280 65% 60%;          /* Purple accent */
+    --accent-foreground: 120 100% 95%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;       /* Red for warnings */
+    --destructive-foreground: 120 100% 95%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 0 0% 18%;             /* Dark border */
+    --input: 0 0% 12%;              /* Input background */
+    --ring: 120 100% 50%;           /* Green focus ring */
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* BLACKFORCES Gradient System */
+    --gradient-primary: linear-gradient(135deg, hsl(120 100% 50%), hsl(120 100% 40%));
+    --gradient-secondary: linear-gradient(135deg, hsl(280 65% 60%), hsl(280 65% 50%));
+    --gradient-dark: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 6%));
+    --gradient-glitch: linear-gradient(90deg, hsl(120 100% 50%), hsl(280 65% 60%), hsl(120 100% 50%));
+
+    /* Shadows with neon glow */
+    --shadow-neon-green: 0 0 20px hsl(120 100% 50% / 0.3);
+    --shadow-neon-purple: 0 0 20px hsl(280 65% 60% / 0.3);
+    --shadow-elevated: 0 10px 30px hsl(0 0% 0% / 0.5);
+
+    /* Animation speeds */
+    --transition-fast: 0.15s ease-out;
+    --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +119,192 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-space overflow-x-hidden;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  /* BLACKFORCES Custom Utilities */
+  .font-space {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+  }
+  
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-secondary {
+    background: var(--gradient-secondary);
+  }
+  
+  .gradient-dark {
+    background: var(--gradient-dark);
+  }
+  
+  .gradient-glitch {
+    background: var(--gradient-glitch);
+    background-size: 200% 100%;
+    animation: gradient-shift 3s ease-in-out infinite;
+  }
+
+  .shadow-neon-green {
+    box-shadow: var(--shadow-neon-green);
+  }
+  
+  .shadow-neon-purple {
+    box-shadow: var(--shadow-neon-purple);
+  }
+  
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  .glitch-text {
+    position: relative;
+    animation: glitch 2s infinite;
+  }
+
+  .glitch-text::before,
+  .glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .glitch-text::before {
+    animation: glitch-1 0.5s infinite;
+    color: hsl(120 100% 50%);
+    z-index: -1;
+  }
+
+  .glitch-text::after {
+    animation: glitch-2 0.5s infinite;
+    color: hsl(280 65% 60%);
+    z-index: -2;
+  }
+}
+
+@layer keyframes {
+  @keyframes gradient-shift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes glitch {
+    0%, 100% {
+      transform: translate(0);
+    }
+    20% {
+      transform: translate(-2px, 2px);
+    }
+    40% {
+      transform: translate(-2px, -2px);
+    }
+    60% {
+      transform: translate(2px, 2px);
+    }
+    80% {
+      transform: translate(2px, -2px);
+    }
+  }
+
+  @keyframes glitch-1 {
+    0%, 100% {
+      transform: translate(0);
+    }
+    10% {
+      transform: translate(-2px, -2px);
+    }
+    20% {
+      transform: translate(2px, 2px);
+    }
+    30% {
+      transform: translate(-2px, 2px);
+    }
+    40% {
+      transform: translate(2px, -2px);
+    }
+    50% {
+      transform: translate(-2px, -2px);
+    }
+    60% {
+      transform: translate(2px, 2px);
+    }
+    70% {
+      transform: translate(-2px, 2px);
+    }
+    80% {
+      transform: translate(2px, -2px);
+    }
+    90% {
+      transform: translate(-2px, -2px);
+    }
+  }
+
+  @keyframes glitch-2 {
+    0%, 100% {
+      transform: translate(0);
+    }
+    10% {
+      transform: translate(2px, 2px);
+    }
+    20% {
+      transform: translate(-2px, -2px);
+    }
+    30% {
+      transform: translate(2px, -2px);
+    }
+    40% {
+      transform: translate(-2px, 2px);
+    }
+    50% {
+      transform: translate(2px, 2px);
+    }
+    60% {
+      transform: translate(-2px, -2px);
+    }
+    70% {
+      transform: translate(2px, -2px);
+    }
+    80% {
+      transform: translate(-2px, 2px);
+    }
+    90% {
+      transform: translate(2px, 2px);
+    }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 5px hsl(120 100% 50% / 0.4);
+    }
+    50% {
+      box-shadow: 0 0 20px hsl(120 100% 50% / 0.8);
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
   }
 }
