@@ -1,73 +1,99 @@
-# Welcome to your Lovable project
 
-## Project info
+# Forces Dominate
 
-**URL**: https://lovable.dev/projects/ab8e7bd8-8be5-4829-8edd-a1edc84b3bac
+## Overview
 
-## How can I edit this code?
+Forces Dominate is a modern React app built with Vite, TypeScript, shadcn/ui, and Tailwind CSS. It features a robust authentication UI supporting both email/password and magic link (passwordless) login via Supabase, with full error and loading state handling. The app is designed for seamless deployment to Azure Static Web Apps.
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ab8e7bd8-8be5-4829-8edd-a1edc84b3bac) and start prompting.
+- **Authentication UI**: Sign up/sign in with email/password or magic link (Supabase OTP)
+- **Loading & Error Handling**: User feedback for all auth actions
+- **Protected Routes**: Example demo page for authenticated users
+- **Responsive Design**: Built with shadcn/ui and Tailwind CSS
+- **SPA Routing**: Configured for Azure Static Web Apps
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## Local Development
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. **Clone the repository:**
+   ```sh
+   git clone <YOUR_GIT_URL>
+   cd <YOUR_PROJECT_NAME>
+   ```
+2. **Install dependencies:**
+   ```sh
+   npm install
+   ```
+3. **Set up environment variables:**
+   - Copy `.env.example` to `.env` and fill in:
+     - `VITE_SUPABASE_URL`
+     - `VITE_SUPABASE_ANON_KEY`
+4. **Start the dev server:**
+   ```sh
+   npm run dev
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## Authentication & Supabase Setup
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- Create a [Supabase](https://supabase.com/) project
+- Get your Project URL and anon public key from Supabase dashboard
+- Add them to your `.env` file as `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+- The Auth UI supports both email/password and magic link (OTP) login
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Deployment: Azure Static Web Apps
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+This project is ready for deployment to Azure Static Web Apps (SWA).
+
+### Key Notes:
+- **Node.js 20+ is required** (see `.nvmrc`)
+- The build command must be set to `npm run build` in your workflow or Azure portal
+- SPA routing is enabled via `staticwebapp.config.json`
+- Required environment variables: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+
+### GitHub Actions Workflow
+The repo includes a pre-configured workflow for Azure SWA deployment. If you customize, ensure:
+
+```yaml
+app_build_command: "npm run build"
 ```
 
-**Edit a file directly in GitHub**
+### Troubleshooting
+- If deployment fails, check:
+  - Node.js version in workflow matches `.nvmrc`
+  - `app_build_command` is set
+  - All required environment variables are present in Azure portal or GitHub secrets
+- For SPA routing issues, verify `staticwebapp.config.json` is present and correct
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## Environment Variables
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Create a `.env` file in the project root:
 
-## What technologies are used for this project?
+```env
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Useful Links
 
-## How can I deploy this project?
+- [Supabase Docs](https://supabase.com/docs)
+- [Azure Static Web Apps Docs](https://learn.microsoft.com/azure/static-web-apps/)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Vite](https://vitejs.dev/)
 
-Simply open [Lovable](https://lovable.dev/projects/ab8e7bd8-8be5-4829-8edd-a1edc84b3bac) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
+## Credits
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Created by RaaHTecH-Org. Powered by open source.

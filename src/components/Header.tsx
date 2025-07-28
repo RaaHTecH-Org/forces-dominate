@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogIn } from "lucide-react";
+import { CartButton } from "@/components/CartButton";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import sneakerIcon from "@/assets/sneaker-icon.png";
@@ -46,6 +47,7 @@ const Header = () => {
 
           {/* Auth Panel */}
           <div className="hidden md:flex items-center gap-4">
+            <CartButton />
             {user ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm text-muted-foreground">Full Force Mode</span>
@@ -95,7 +97,8 @@ const Header = () => {
                   {item.name}
                 </a>
               ))}
-              <div className="pt-4 border-t border-primary/20">
+              <div className="pt-4 border-t border-primary/20 flex flex-col gap-2">
+                <CartButton />
                 {user ? (
                   <Button variant="elite" className="w-full" asChild>
                     <Link to="/dashboard">

@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Heart, ShoppingCart, Search, Trash2, Package } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 
 export function WishlistPage() {
+  const { addToCart } = useCart();
   const wishlistItems = [
     {
       id: 1,
@@ -144,7 +146,15 @@ export function WishlistPage() {
 
               <div className="flex gap-2 pt-2">
                 {item.inStock ? (
-                  <Button className="flex-1 gap-2">
+                  <Button
+                    className="flex-1 gap-2"
+                    onClick={() =>
+                      addToCart({
+                        ...item,
+                        quantity: 1,
+                      })
+                    }
+                  >
                     <ShoppingCart className="w-4 h-4" />
                     Add to Cart
                   </Button>

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { CartProvider } from "@/contexts/CartContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { NetworkStatus } from "@/components/NetworkStatus";
 import Index from "./pages/Index";
@@ -13,6 +14,7 @@ import AuthPage from "./pages/AuthPage";
 import AuthDemo from "./pages/AuthDemo";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import CartPage from "./pages/CartPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,24 +37,27 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <AuthProvider>
-            <Toaster />
-            <Sonner />
-            <NetworkStatus />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/auth-page" element={<AuthPage />} />
-                <Route path="/auth-demo" element={<AuthDemo />} />
-                <Route path="/dashboard/*" element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                } />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
+            <CartProvider>
+              <Toaster />
+              <Sonner />
+              <NetworkStatus />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/auth-page" element={<AuthPage />} />
+                  <Route path="/auth-demo" element={<AuthDemo />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/dashboard/*" element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  } />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </CartProvider>
           </AuthProvider>
         </TooltipProvider>
       </QueryClientProvider>
