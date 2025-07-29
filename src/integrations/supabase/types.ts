@@ -14,6 +14,227 @@ export type Database = {
   }
   public: {
     Tables: {
+      bot_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          monitor_id: string
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          monitor_id: string
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          monitor_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bot_alerts_monitor_id_fkey"
+            columns: ["monitor_id"]
+            isOneToOne: false
+            referencedRelation: "bot_monitors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bot_monitors: {
+        Row: {
+          created_at: string
+          current_price: number | null
+          id: string
+          is_active: boolean
+          keywords: string[] | null
+          last_checked: string | null
+          product_name: string
+          product_url: string | null
+          site_id: string
+          size_preference: string[] | null
+          stock_status: string | null
+          target_price: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_price?: number | null
+          id?: string
+          is_active?: boolean
+          keywords?: string[] | null
+          last_checked?: string | null
+          product_name: string
+          product_url?: string | null
+          site_id: string
+          size_preference?: string[] | null
+          stock_status?: string | null
+          target_price?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_price?: number | null
+          id?: string
+          is_active?: boolean
+          keywords?: string[] | null
+          last_checked?: string | null
+          product_name?: string
+          product_url?: string | null
+          site_id?: string
+          size_preference?: string[] | null
+          stock_status?: string | null
+          target_price?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bot_monitors_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "bot_sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bot_search_results: {
+        Row: {
+          created_at: string
+          id: string
+          results: Json | null
+          search_query: string
+          site_id: string
+          total_found: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          results?: Json | null
+          search_query: string
+          site_id: string
+          total_found?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          results?: Json | null
+          search_query?: string
+          site_id?: string
+          total_found?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bot_search_results_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "bot_sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bot_sites: {
+        Row: {
+          base_url: string
+          created_at: string
+          id: string
+          name: string
+          rate_limit_ms: number | null
+          selectors: Json | null
+          site_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          base_url: string
+          created_at?: string
+          id?: string
+          name: string
+          rate_limit_ms?: number | null
+          selectors?: Json | null
+          site_type: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          base_url?: string
+          created_at?: string
+          id?: string
+          name?: string
+          rate_limit_ms?: number | null
+          selectors?: Json | null
+          site_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      bot_tasks: {
+        Row: {
+          completed_at: string | null
+          config: Json | null
+          created_at: string
+          id: string
+          monitor_id: string
+          result: Json | null
+          scheduled_at: string | null
+          started_at: string | null
+          status: string
+          task_type: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          config?: Json | null
+          created_at?: string
+          id?: string
+          monitor_id: string
+          result?: Json | null
+          scheduled_at?: string | null
+          started_at?: string | null
+          status?: string
+          task_type: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          config?: Json | null
+          created_at?: string
+          id?: string
+          monitor_id?: string
+          result?: Json | null
+          scheduled_at?: string | null
+          started_at?: string | null
+          status?: string
+          task_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bot_tasks_monitor_id_fkey"
+            columns: ["monitor_id"]
+            isOneToOne: false
+            referencedRelation: "bot_monitors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
