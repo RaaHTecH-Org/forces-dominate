@@ -31,18 +31,31 @@ const BotSystemStatus: React.FC = () => {
         .select('id')
         .eq('status', 'active');
 
-      // Check crawler function
-      const { data: crawlerTest, error: crawlerError } = await supabase.functions.invoke('custom-crawler', {
-        body: {
-          action: 'test_selectors',
-          url: 'https://example.com',
-          selectors: { title: 'h1' }
+      // Check crawler function with simple ping
+      let crawlerStatus: 'healthy' | 'warning' | 'error' = 'healthy';
+      try {
+        const { data: crawlerTest, error: crawlerError } = await supabase.functions.invoke('custom-crawler', {
+          body: {
+            action: 'test_selectors',
+            url: 'https://httpbin.org/html',
+            selectors: { title: 'title' }
+          }
+        });
+        
+        // Check if the function is responsive (even if it returns an error due to environment constraints)
+        if (crawlerError && crawlerError.message?.includes('PermissionDenied')) {
+          crawlerStatus = 'warning'; // Function is running but has environment constraints
+        } else if (crawlerError) {
+          crawlerStatus = 'error';
         }
-      });
+      } catch (error) {
+        console.error('Crawler test failed:', error);
+        crawlerStatus = 'error';
+      }
 
       setHealth({
         database: dbError ? 'error' : 'healthy',
-        crawler: crawlerError ? 'error' : 'healthy',
+        crawler: crawlerStatus,
         sites: sites?.length || 0,
         lastCheck: new Date().toISOString()
       });
@@ -51,6 +64,12 @@ const BotSystemStatus: React.FC = () => {
     } catch (error) {
       console.error('Health check failed:', error);
       toast.error("Health check failed");
+      setHealth(prev => ({
+        ...prev,
+        database: 'error',
+        crawler: 'error',
+        lastCheck: new Date().toISOString()
+      }));
     } finally {
       setIsChecking(false);
     }
