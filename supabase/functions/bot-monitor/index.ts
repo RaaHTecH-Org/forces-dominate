@@ -72,82 +72,72 @@ serve(async (req) => {
           }
 
           const currentData = crawlData.product || {};
+          const previousPrice = monitor.current_price;
+          const currentPrice = parseFloat(currentData.price) || previousPrice;
+          const currentStock = currentData.stock || 'unknown';
+          
+          logStep(`Product data extracted`, { 
+            previousPrice, 
+            currentPrice, 
+            currentStock,
+            productName: monitor.product_name 
+          });
 
-            const previousPrice = monitor.current_price;
-            const currentPrice = parseFloat(currentData.price) || previousPrice;
-            const currentStock = currentData.stock_status || 'unknown';
-            
-            logStep(`Product data extracted`, { 
-              previousPrice, 
-              currentPrice, 
-              currentStock,
-              productName: monitor.product_name 
-            });
-
-            // Check for price drop
-            if (monitor.target_price && currentPrice <= monitor.target_price && currentPrice < previousPrice) {
-              alerts.push({
-                user_id: monitor.user_id,
-                monitor_id: monitor.id,
-                alert_type: 'price_drop',
-                message: `🔥 ${monitor.product_name} dropped to $${currentPrice} (target: $${monitor.target_price})`
-              });
-            }
-
-            // Check for stock change
-            if (currentStock === 'in_stock' && monitor.stock_status !== 'in_stock') {
-              alerts.push({
-                user_id: monitor.user_id,
-                monitor_id: monitor.id,
-                alert_type: 'back_in_stock',
-                message: `📦 ${monitor.product_name} is back in stock!`
-              });
-            }
-
-            // Check for size availability
-            if (monitor.size_preference?.length > 0 && currentData.available_sizes) {
-              const availablePrefSizes = monitor.size_preference.filter(size => 
-                currentData.available_sizes.includes(size)
-              );
-              
-              if (availablePrefSizes.length > 0) {
-                alerts.push({
-                  user_id: monitor.user_id,
-                  monitor_id: monitor.id,
-                  alert_type: 'size_available',
-                  message: `👟 ${monitor.product_name} - Size ${availablePrefSizes.join(', ')} now available!`
-                });
-              }
-            }
-
-            // Update monitor with latest data
-            await supabaseClient
-              .from('bot_monitors')
-              .update({
-                current_price: currentPrice,
-                stock_status: currentStock,
-                last_checked: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-              })
-              .eq('id', monitor.id);
-
-            results.push({
+          // Check for price drop
+          if (monitor.target_price && currentPrice <= monitor.target_price && currentPrice < previousPrice) {
+            alerts.push({
+              user_id: monitor.user_id,
               monitor_id: monitor.id,
-              product_name: monitor.product_name,
-              previous_price: previousPrice,
-              current_price: currentPrice,
-              stock_status: currentStock,
-              alerts_generated: alerts.filter(a => a.monitor_id === monitor.id).length
-            });
-
-          } else {
-            logStep(`Failed to crawl monitor ${monitor.id}`, await crawlResponse.text());
-            results.push({
-              monitor_id: monitor.id,
-              product_name: monitor.product_name,
-              error: 'Failed to crawl product page'
+              alert_type: 'price_drop',
+              message: `🔥 ${monitor.product_name} dropped to $${currentPrice} (target: $${monitor.target_price})`
             });
           }
+
+          // Check for stock change
+          if (currentStock === 'in_stock' && monitor.stock_status !== 'in_stock') {
+            alerts.push({
+              user_id: monitor.user_id,
+              monitor_id: monitor.id,
+              alert_type: 'back_in_stock',
+              message: `📦 ${monitor.product_name} is back in stock!`
+            });
+          }
+
+          // Check for size availability
+          if (monitor.size_preference?.length > 0 && currentData.available_sizes) {
+            const availablePrefSizes = monitor.size_preference.filter(size => 
+              currentData.available_sizes.includes(size)
+            );
+            
+            if (availablePrefSizes.length > 0) {
+              alerts.push({
+                user_id: monitor.user_id,
+                monitor_id: monitor.id,
+                alert_type: 'size_available',
+                message: `👟 ${monitor.product_name} - Size ${availablePrefSizes.join(', ')} now available!`
+              });
+            }
+          }
+
+          // Update monitor with latest data
+          await supabaseClient
+            .from('bot_monitors')
+            .update({
+              current_price: currentPrice,
+              stock_status: currentStock,
+              last_checked: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', monitor.id);
+
+          results.push({
+            monitor_id: monitor.id,
+            product_name: monitor.product_name,
+            previous_price: previousPrice,
+            current_price: currentPrice,
+            stock_status: currentStock,
+            alerts_generated: alerts.filter(a => a.monitor_id === monitor.id).length
+          });
 
           // Rate limiting
           await new Promise(resolve => setTimeout(resolve, monitor.bot_sites.rate_limit_ms || 1000));
