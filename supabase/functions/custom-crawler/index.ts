@@ -31,33 +31,32 @@ serve(async (req) => {
 
     const { action, siteId, url, keywords, targetPrice, sizePref } = requestData;
 
-    // Only require auth for user-specific actions
+    // Try to get user authentication for personalization, but allow guest access
     let user = null;
-    if (action !== 'crawl_product') {
-      const authHeader = req.headers.get('Authorization');
-      if (!authHeader) {
-        return new Response(
-          JSON.stringify({ error: 'Authorization header required' }),
-          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+    const authHeader = req.headers.get('Authorization');
+    
+    if (authHeader) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        const { data: { user: userData }, error: userError } = await supabase.auth.getUser(token);
+        
+        if (!userError && userData) {
+          user = userData;
+          logStep('User authenticated', { userId: user.id });
+        } else {
+          logStep('Authentication failed, continuing as guest', userError);
+        }
+      } catch (error) {
+        logStep('Auth error, continuing as guest', error);
       }
-
-      const token = authHeader.replace('Bearer ', '');
-      const { data: { user: userData }, error: userError } = await supabase.auth.getUser(token);
-      
-      if (userError || !userData) {
-        return new Response(
-          JSON.stringify({ error: 'Invalid token' }),
-          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      user = userData;
+    } else {
+      logStep('No auth header, continuing as guest');
     }
 
     if (action === 'crawl_product') {
       return await crawlProduct(supabase, user?.id, siteId, url, targetPrice, sizePref);
     } else if (action === 'search_products') {
-      return await searchProducts(supabase, user!.id, keywords);
+      return await searchProducts(supabase, user?.id, keywords);
     } else if (action === 'test_selectors') {
       return await testSelectors(requestData.url, requestData.selectors);
     } else {
@@ -240,7 +239,7 @@ async function crawlProduct(supabase: any, userId: string | undefined, siteId: s
   }
 }
 
-async function searchProducts(supabase: any, userId: string, keywords: string[]) {
+async function searchProducts(supabase: any, userId: string | undefined, keywords: string[]) {
   logStep('Starting product search', { keywords });
 
   try {
@@ -366,20 +365,24 @@ async function searchProducts(supabase: any, userId: string, keywords: string[])
       await browser.close();
     }
 
-    // Store search results
-    const { data: savedResults, error: saveError } = await supabase
-      .from('bot_search_results')
-      .insert({
-        user_id: userId,
-        search_query: keywords.join(' '),
-        results: searchResults,
-        total_found: searchResults.length,
-      })
-      .select()
-      .single();
+    // Store search results only if user is authenticated
+    if (userId) {
+      const { data: savedResults, error: saveError } = await supabase
+        .from('bot_search_results')
+        .insert({
+          user_id: userId,
+          search_query: keywords.join(' '),
+          results: searchResults,
+          total_found: searchResults.length,
+        })
+        .select()
+        .single();
 
-    if (saveError) {
-      logStep('Error saving search results', saveError);
+      if (saveError) {
+        logStep('Error saving search results', saveError);
+      }
+    } else {
+      logStep('Guest user - not saving search results');
     }
 
     logStep(`Search completed. Found ${searchResults.length} products`);

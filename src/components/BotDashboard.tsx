@@ -11,6 +11,7 @@ import { BotMonitorList } from './bot/BotMonitorList';
 import { BotAlerts } from './bot/BotAlerts';
 import { BotTaskList } from './bot/BotTaskList';
 import { CustomSiteBuilder } from './bot/CustomSiteBuilder';
+import BotSystemStatus from './bot/BotSystemStatus';
 import { Bot, Search, Monitor, ShoppingCart, CreditCard, Bell, Activity, Settings } from 'lucide-react';
 
 interface BotStats {
@@ -204,6 +205,9 @@ export const BotDashboard: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* System Status Card */}
+      <BotSystemStatus />
 
       {/* Main Dashboard Tabs */}
       <Tabs defaultValue="search" className="space-y-4">
