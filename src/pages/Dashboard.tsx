@@ -9,6 +9,7 @@ import { WishlistPage } from "@/components/dashboard/WishlistPage";
 import { BillingPage } from "@/components/dashboard/BillingPage";
 import { NotificationsPage } from "@/components/dashboard/NotificationsPage";
 import { SettingsPage } from "@/components/dashboard/SettingsPage";
+import { BotDashboard } from "@/components/BotDashboard";
 
 const Dashboard = () => {
   return (
@@ -26,6 +27,7 @@ const Dashboard = () => {
               <Route path="billing" element={<BillingPage />} />
               <Route path="notifications" element={<NotificationsPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="bot" element={<BotDashboard />} />
             </Routes>
           </main>
         </div>

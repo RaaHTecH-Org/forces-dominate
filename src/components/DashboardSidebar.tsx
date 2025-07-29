@@ -9,7 +9,8 @@ import {
   CreditCard,
   Bell,
   LogOut,
-  Zap
+  Zap,
+  Bot
 } from "lucide-react";
 
 import {
@@ -29,6 +30,7 @@ import { Button } from "@/components/ui/button";
 
 const menuItems = [
   { title: "Overview", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Target Bot", url: "/dashboard/bot", icon: Bot },
   { title: "Profile", url: "/dashboard/profile", icon: User },
   { title: "Orders", url: "/dashboard/orders", icon: ShoppingBag },
   { title: "Wishlist", url: "/dashboard/wishlist", icon: Heart },
