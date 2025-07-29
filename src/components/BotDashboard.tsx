@@ -10,7 +10,8 @@ import { BotSiteSearch } from './bot/BotSiteSearch';
 import { BotMonitorList } from './bot/BotMonitorList';
 import { BotAlerts } from './bot/BotAlerts';
 import { BotTaskList } from './bot/BotTaskList';
-import { Bot, Search, Monitor, ShoppingCart, CreditCard, Bell, Activity } from 'lucide-react';
+import { CustomSiteBuilder } from './bot/CustomSiteBuilder';
+import { Bot, Search, Monitor, ShoppingCart, CreditCard, Bell, Activity, Settings } from 'lucide-react';
 
 interface BotStats {
   total_monitors: number;
@@ -206,7 +207,7 @@ export const BotDashboard: React.FC = () => {
 
       {/* Main Dashboard Tabs */}
       <Tabs defaultValue="search" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="search" className="flex items-center gap-2">
             <Search className="h-4 w-4" />
             Search
@@ -222,6 +223,10 @@ export const BotDashboard: React.FC = () => {
           <TabsTrigger value="tasks" className="flex items-center gap-2">
             <ShoppingCart className="h-4 w-4" />
             Tasks
+          </TabsTrigger>
+          <TabsTrigger value="sites" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Sites
           </TabsTrigger>
           <TabsTrigger value="checkout" className="flex items-center gap-2">
             <CreditCard className="h-4 w-4" />
@@ -281,6 +286,20 @@ export const BotDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <BotTaskList onStatsUpdate={loadStats} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="sites" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Site Management</CardTitle>
+              <CardDescription>
+                Configure custom sites and manage scraping configurations
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CustomSiteBuilder onSiteAdded={loadStats} />
             </CardContent>
           </Card>
         </TabsContent>

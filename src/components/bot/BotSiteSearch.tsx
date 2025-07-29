@@ -75,7 +75,7 @@ export const BotSiteSearch: React.FC<BotSiteSearchProps> = ({ onStatsUpdate }) =
     setSearchResults([]);
 
     try {
-      const { data, error } = await supabase.functions.invoke('bot-crawler', {
+      const { data, error } = await supabase.functions.invoke('custom-crawler', {
         body: {
           action: 'search_products',
           keywords: searchQuery.split(' '),
@@ -85,11 +85,18 @@ export const BotSiteSearch: React.FC<BotSiteSearchProps> = ({ onStatsUpdate }) =
 
       if (error) throw error;
 
-      setSearchResults(data.results || []);
+      // Transform results to match expected format
+      const transformedResults = data.results ? [{
+        site: 'All Sites',
+        site_id: 'all',
+        products: data.results
+      }] : [];
+      
+      setSearchResults(transformedResults);
       
       toast({
         title: "Search Complete",
-        description: `Found ${data.total_products} products across ${data.total_sites} sites`,
+        description: `Found ${data.total_found || 0} products`,
       });
 
     } catch (error) {
@@ -109,7 +116,7 @@ export const BotSiteSearch: React.FC<BotSiteSearchProps> = ({ onStatsUpdate }) =
       const targetPrice = prompt(`Enter target price for ${product.title} (current: $${product.price}):`);
       if (!targetPrice) return;
 
-      const { data, error } = await supabase.functions.invoke('bot-crawler', {
+      const { data, error } = await supabase.functions.invoke('custom-crawler', {
         body: {
           action: 'crawl_product',
           siteId: siteId,

@@ -1,1 +1,16 @@
 project_id = "akdiemmxgvffopxmudia"
+
+[functions.bot-atc]
+verify_jwt = false
+
+[functions.bot-checkout]
+verify_jwt = false
+
+[functions.bot-crawler]
+verify_jwt = false
+
+[functions.bot-monitor]
+verify_jwt = false
+
+[functions.custom-crawler]
+verify_jwt = false
