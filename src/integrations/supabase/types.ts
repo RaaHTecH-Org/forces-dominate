@@ -149,6 +149,33 @@ export type Database = {
           },
         ]
       }
+      bot_sessions: {
+        Row: {
+          cookies: string | null
+          created_at: string
+          domain: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cookies?: string | null
+          created_at?: string
+          domain: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cookies?: string | null
+          created_at?: string
+          domain?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       bot_sites: {
         Row: {
           base_url: string

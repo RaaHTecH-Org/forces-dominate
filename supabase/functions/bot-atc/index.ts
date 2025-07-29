@@ -433,49 +433,31 @@ serve(async (req) => {
 
     logStep("ATC task created", { taskId: task.id });
 
-    // Real ATC process using Puppeteer automation
+    // Real ATC process using Puppeteer automation  
     const taskResult = await performATCAutomation(monitor, size, quantity, autoCheckout, task.id, supabaseClient, user.id, monitorId);
 
-      // Update task with result
-      await supabaseClient
-        .from('bot_tasks')
-        .update({
-          status: taskResult.success ? 'completed' : 'failed',
-          result: taskResult,
-          completed_at: new Date().toISOString()
-        })
-        .eq('id', task.id);
+    // Update task with result
+    await supabaseClient
+      .from('bot_tasks')
+      .update({
+        status: taskResult.success ? 'completed' : 'failed',
+        result: taskResult,
+        completed_at: new Date().toISOString()
+      })
+      .eq('id', task.id);
 
-      logStep("ATC task completed", { success: taskResult.success, message: taskResult.message });
+    logStep("ATC task completed", { success: taskResult.success, message: taskResult.message });
 
-      return new Response(JSON.stringify({
-        success: true,
-        task: {
-          ...task,
-          status: taskResult.success ? 'completed' : 'failed',
-          result: taskResult
-        }
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-
-    } catch (error) {
-      // Update task as failed
-      await supabaseClient
-        .from('bot_tasks')
-        .update({
-          status: 'failed',
-          result: {
-            success: false,
-            message: error.message,
-            timestamp: new Date().toISOString()
-          },
-          completed_at: new Date().toISOString()
-        })
-        .eq('id', task.id);
-
-      throw error;
-    }
+    return new Response(JSON.stringify({
+      success: true,
+      task: {
+        ...task,
+        status: taskResult.success ? 'completed' : 'failed',
+        result: taskResult
+      }
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
 
   } catch (error) {
     logStep("Error in bot ATC", error.message);
