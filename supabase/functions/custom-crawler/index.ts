@@ -26,34 +26,38 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get user from auth header
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Authorization header required' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-    
-    if (userError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid token' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
     const requestData = await req.json();
     logStep('Request received', requestData);
 
     const { action, siteId, url, keywords, targetPrice, sizePref } = requestData;
 
+    // Only require auth for user-specific actions
+    let user = null;
+    if (action !== 'crawl_product') {
+      const authHeader = req.headers.get('Authorization');
+      if (!authHeader) {
+        return new Response(
+          JSON.stringify({ error: 'Authorization header required' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user: userData }, error: userError } = await supabase.auth.getUser(token);
+      
+      if (userError || !userData) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid token' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      user = userData;
+    }
+
     if (action === 'crawl_product') {
-      return await crawlProduct(supabase, user.id, siteId, url, targetPrice, sizePref);
+      return await crawlProduct(supabase, user?.id, siteId, url, targetPrice, sizePref);
     } else if (action === 'search_products') {
-      return await searchProducts(supabase, user.id, keywords);
+      return await searchProducts(supabase, user!.id, keywords);
     } else if (action === 'test_selectors') {
       return await testSelectors(requestData.url, requestData.selectors);
     } else {
@@ -72,7 +76,7 @@ serve(async (req) => {
   }
 });
 
-async function crawlProduct(supabase: any, userId: string, siteId: string, url: string, targetPrice?: number, sizePref?: string[]) {
+async function crawlProduct(supabase: any, userId: string | undefined, siteId: string, url: string, targetPrice?: number, sizePref?: string[]) {
   logStep('Starting product crawl', { siteId, url });
 
   try {
@@ -161,54 +165,56 @@ async function crawlProduct(supabase: any, userId: string, siteId: string, url: 
 
       logStep('Product data extracted', productData);
 
-      // Create or update monitor
-      const { data: monitor, error: monitorError } = await supabase
-        .from('bot_monitors')
-        .upsert({
-          user_id: userId,
-          site_id: siteId,
-          product_url: url,
-          product_name: productData.title || 'Unknown Product',
-          current_price: productData.price || 0,
-          target_price: targetPrice,
-          stock_status: productData.stock || 'unknown',
-          size_preference: sizePref || [],
-          last_checked: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-
-      if (monitorError) {
-        logStep('Error creating monitor', monitorError);
-        return new Response(
-          JSON.stringify({ error: 'Failed to create monitor' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      // Check for alerts
+      // Only create monitor if user is provided (for user-initiated crawls)
+      let monitor = null;
       let alert = null;
-      const shouldAlert = (targetPrice && productData.price && productData.price <= targetPrice) ||
-                         (productData.stock && !productData.stock.toLowerCase().includes('out'));
-
-      if (shouldAlert) {
-        const alertMessage = targetPrice && productData.price && productData.price <= targetPrice
-          ? `Price drop alert: ${productData.title} is now $${productData.price}`
-          : `Stock alert: ${productData.title} is back in stock`;
-
-        const { data: alertData } = await supabase
-          .from('bot_alerts')
-          .insert({
+      
+      if (userId && targetPrice) {
+        const { data: monitorData, error: monitorError } = await supabase
+          .from('bot_monitors')
+          .upsert({
             user_id: userId,
-            monitor_id: monitor.id,
-            alert_type: targetPrice && productData.price && productData.price <= targetPrice ? 'price_drop' : 'stock_available',
-            message: alertMessage,
+            site_id: siteId,
+            product_url: url,
+            product_name: productData.title || 'Unknown Product',
+            current_price: productData.price || 0,
+            target_price: targetPrice,
+            stock_status: productData.stock || 'unknown',
+            size_preference: sizePref || [],
+            last_checked: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
           })
           .select()
           .single();
 
-        alert = alertData;
+        if (monitorError) {
+          logStep('Error creating monitor', monitorError);
+        } else {
+          monitor = monitorData;
+          
+          // Check for alerts
+          const shouldAlert = (targetPrice && productData.price && productData.price <= targetPrice) ||
+                             (productData.stock && !productData.stock.toLowerCase().includes('out'));
+
+          if (shouldAlert) {
+            const alertMessage = targetPrice && productData.price && productData.price <= targetPrice
+              ? `Price drop alert: ${productData.title} is now $${productData.price}`
+              : `Stock alert: ${productData.title} is back in stock`;
+
+            const { data: alertData } = await supabase
+              .from('bot_alerts')
+              .insert({
+                user_id: userId,
+                monitor_id: monitor.id,
+                alert_type: targetPrice && productData.price && productData.price <= targetPrice ? 'price_drop' : 'stock_available',
+                message: alertMessage,
+              })
+              .select()
+              .single();
+
+            alert = alertData;
+          }
+        }
       }
 
       return new Response(

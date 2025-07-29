@@ -46,11 +46,6 @@ serve(async (req) => {
 
       logStep("Active monitors loaded", { count: monitors?.length || 0 });
 
-      const firecrawlApiKey = Deno.env.get('FIRECRAWL_API_KEY');
-      if (!firecrawlApiKey) {
-        throw new Error('FIRECRAWL_API_KEY not configured');
-      }
-
       const results = [];
       const alerts = [];
 
@@ -58,33 +53,25 @@ serve(async (req) => {
         try {
           logStep(`Checking monitor`, { id: monitor.id, product: monitor.product_name });
 
-          // Crawl product page for updates
-          const crawlResponse = await fetch('https://api.firecrawl.dev/v0/scrape', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${firecrawlApiKey}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+          // Use custom crawler instead of Firecrawl
+          const crawlResponse = await supabaseClient.functions.invoke('custom-crawler', {
+            body: {
+              action: 'crawl_product',
               url: monitor.product_url,
-              pageOptions: {
-                onlyMainContent: true,
-                waitFor: 1000
-              },
-              extractorOptions: {
-                mode: 'llm-extraction',
-                extractionPrompt: `Extract current product information:
-                  - price: current price as number
-                  - stock_status: in_stock, out_of_stock, limited
-                  - available_sizes: array of available sizes
-                  Return as JSON`
-              }
-            }),
+              siteId: monitor.site_id
+            }
           });
 
-          if (crawlResponse.ok) {
-            const crawlData = await crawlResponse.json();
-            const currentData = crawlData.data?.llm_extraction || {};
+          if (crawlResponse.error) {
+            throw new Error(`Crawler error: ${crawlResponse.error.message}`);
+          }
+
+          const crawlData = crawlResponse.data;
+          if (!crawlData.success) {
+            throw new Error(`Crawl failed: ${crawlData.error}`);
+          }
+
+          const currentData = crawlData.product || {};
 
             const previousPrice = monitor.current_price;
             const currentPrice = parseFloat(currentData.price) || previousPrice;
