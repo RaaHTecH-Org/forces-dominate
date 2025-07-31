@@ -480,8 +480,16 @@ async function testSelectors(url: string, selectors: any) {
 
   } catch (error) {
     logStep('Error in testSelectors', error);
+    
+    // Return specific error information for better client-side handling
+    const errorResponse = {
+      error: 'Failed to test selectors',
+      errorType: (error as any)?.name || 'Unknown',
+      message: (error as any)?.message || 'Unknown error'
+    };
+    
     return new Response(
-      JSON.stringify({ error: 'Failed to test selectors' }),
+      JSON.stringify(errorResponse),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

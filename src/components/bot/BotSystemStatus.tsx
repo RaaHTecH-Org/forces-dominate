@@ -43,10 +43,14 @@ const BotSystemStatus: React.FC = () => {
         });
         
         // Check if the function is responsive (even if it returns an error due to environment constraints)
-        if (crawlerError && crawlerError.message?.includes('PermissionDenied')) {
-          crawlerStatus = 'warning'; // Function is running but has environment constraints
-        } else if (crawlerError) {
-          crawlerStatus = 'error';
+        if (crawlerError) {
+          // Check for specific error types in the response
+          const errorData = crawlerError as any;
+          if (errorData.errorType === 'PermissionDenied' || errorData.message?.includes('PermissionDenied')) {
+            crawlerStatus = 'warning'; // Function is running but has environment constraints
+          } else {
+            crawlerStatus = 'error';
+          }
         }
       } catch (error) {
         console.error('Crawler test failed:', error);
